@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APPLIED DATABASE Login Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        form {
+            margin: 50px auto;
+            max-width: 500px;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0px 0px 10px #ccc;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        #additional_fields {
+            margin-bottom: 20px;
+        }
+
+        .flash-messages {
+            margin-top: 20px;
+        }
+
+        .flash-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .flash-message.success {
+            background-color: #dff0d8;
+            border-color: #d6e9c6;
+            color: #3c763d;
+        }
+
+        .flash-message.error {
+            background-color: #f2dede;
+            border-color: #ebccd1;
+            color: #a94442;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h1>Sign In</h1>
+<form action="/SignIn" method="post">
+    <div class="form-group">
+        <label for="user_type">User Type:</label>
+        <select id="user_type" name="user_type" required class="form-control">
+            <option value="">Select User Type</option>
+            <option value="patient">Patient</option>
+            <option value="provider">Provider</option>
+            <option value="nurse">Nurse</option>
+        </select>
+    </div>
+    <div id="additional_fields"></div>
+    <input type="submit" value="Sign In" class="btn btn-primary login-btn">
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+	<div class="flash-message {{ category }}">{{ message }}</div>
+	{% endfor %}
+	{% endif %}
+	{% endwith %}
+	</div>
+
+</form>
+<div class="login-link">
+    <a href="/login">Already have an account? Log in</a>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Listen for changes in the user_type dropdown
+        $('#user_type').on('change', function() {
+            var selectedType = $(this).val();
+        // Clear any previously added additional fields
+        $('#additional_fields').empty();
+
+        // Add the appropriate input fields based on the selected type
+        if (selectedType === 'patient') {
+            $('#additional_fields').append('<label for="patient_id">Patient ID:</label>');
+            $('#additional_fields').append('<input type="number" id="patient_id" name="patient_id" required><br>');
+            $('#additional_fields').append('<label for="first_name">First Name:</label>');
+            $('#additional_fields').append('<input type="text" id="patient_first_name" name="patient_first_name" required><br>');
+            $('#additional_fields').append('<label for="last_name">Last Name:</label>');
+            $('#additional_fields').append('<input type="text" id="patient_last_name" name="patient_last_name" required><br>');
+            $('#additional_fields').append('<label for="gender">Gender:</label>');
+            $('#additional_fields').append('<select id="gender" name="gender" required>' +
+                '<option value="">Select Gender</option>' +
+                '<option value="M">Male</option>' +
+                '<option value="F">Female</option>' +
+                '</select><br>');
+
+            $('#additional_fields').append('<label for="age">Age:</label>');
+            $('#additional_fields').append('<input type="number" id="age" name="age" required><br>');
+            $('#additional_fields').append('<label for="patient_phone">Phone:</label>');
+            $('#additional_fields').append('<input type="text" id="patient_phone" name="patient_phone" required><br>');
+            $('#additional_fields').append('<label for="patient_email">Email:</label>');
+            $('#additional_fields').append('<input type="text" id="patient_email" name="patient_email" required><br>');
+            $('#additional_fields').append('<label for="password">Password</label>');
+            $('#additional_fields').append('<input type="password" id="patient_password" name="patient_password" required><br>');
+            $('#additional_fields').append('<label for="patient_address">Address:</label>');
+            $('#additional_fields').append('<input type="text" id="patient_address" name="patient_address" required><br>');
+            $('#additional_fields').append('<label for="insurance_id">Insurance ID:</label>');
+            $('#additional_fields').append('<input type="number" id="insurance_id" name="insurance_id" required><br>');
+
+        } 
+		else if (selectedType === 'provider') {
+  $('#additional_fields').append('<label for="provider_id">Provider ID:</label>');
+  $('#additional_fields').append('<input type="text" id="provider_id" name="provider_id" required><br>');
+  $('#additional_fields').append('<label for="provider_first_name">First Name:</label>');
+  $('#additional_fields').append('<input type="text" id="provider_first_name" name="provider_first_name" required><br>');
+  $('#additional_fields').append('<label for="provider_last_name">Last Name:</label>');
+  $('#additional_fields').append('<input type="text" id="provider_last_name" name="provider_last_name" required><br>');
+  $('#additional_fields').append('<label for="specialty">Specialty:</label>');
+  $('#additional_fields').append('<input type="text" id="specialty" name="specialty" required><br>');
+  $('#additional_fields').append('<label for="provider_email">Email Address:</label>');
+  $('#additional_fields').append('<input type="text" id="provider_email" name="provider_email" required><br>');
+  $('#additional_fields').append('<label for="provider_password">Password:</label>');
+  $('#additional_fields').append('<input type="password" id="provider_password" name="provider_password" required><br>');
+  $('#additional_fields').append('<label for="appointment_fee">Appointment Fee:</label>');
+  $('#additional_fields').append('<input type="text" id="appointment_fee" name="appointment_fee" required><br>');
+  $('#additional_fields').append('<label for="nurse_id">Nurse ID:</label>');
+  $('#additional_fields').append('<input type="number" id="nurse_id" name="nurse_id" required><br>');
+  $('#additional_fields').append('<label for="number_id">Room Number:</label>');
+  $('#additional_fields').append('<input type="number" id="number_id" name="number_id" required><br>');
+}
+
+        	
+		else if (selectedType === 'nurse') {
+            $('#additional_fields').append('<label for="nurse_id">Nurse ID:</label>');
+            $('#additional_fields').append('<input type="number" id="nurse_id" name="nurse_id" required><br>');
+            $('#additional_fields').append('<label for="nurse_name">Nurse Name:</label>');
+            $('#additional_fields').append('<input type="text" id="nurse_name" name="nurse_name" required><br>');
+            $('#additional_fields').append('<label for="nurse_email">Email Address:</label>');
+            $('#additional_fields').append('<input type="text" id="nurse_email" name="nurse_email" required><br>');
+            $('#additional_fields').append('<label for="password">Password</label>');
+            $('#additional_fields').append('<input type="password" id="nurse_password" name="nurse_password" required><br>');
+            $('#additional_fields').append('<label for="nurse_phone">Nurse Phone:</label>');
+            $('#additional_fields').append('<input type="text" id="nurse_phone" name="nurse_phone" required><br>');
+            $('#additional_fields').append('<label for="visit_id">Visit ID:</label>');
+            $('#additional_fields').append('<input type="number" id="visit_id" name="visit_id" required><br>');
+            $('#additional_fields').append('<label for="priority_id">Priority ID:</label>');
+            $('#additional_fields').append('<input type="number" id="priority_id" name="priority_id" required><br>');
+
+        }
+    });
+});
+</script>
+</body>
+</html>
+

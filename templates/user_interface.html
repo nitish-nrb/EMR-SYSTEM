@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Interface</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-info {
+            margin-bottom: 20px;
+        }
+
+        .btn-fetch-bill {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-fetch-bill:hover {
+            background-color: #0056b3;
+        }
+
+        .bill-amount {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .table th,
+        .table td {
+            padding: 10px;
+            text-align: left;
+            vertical-align: middle;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #212529;
+            font-weight: bold;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+
+        .table td:last-child {
+            white-space: nowrap;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .p-0 {
+            padding: 0;
+        }
+
+        .mt-30 {
+            margin-top: 30px;
+        }
+
+        .logout-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 767px) {
+            .table-responsive {
+                width: 100%;
+                overflow-y: hidden;
+                -ms-overflow-style: -ms-autohiding-scrollbar;
+                border: 1px solid #dee2e6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>User Interface</h1>
+        <div class="user-info">
+            <p><strong>User type:</strong> {{ user_type }}</p>
+            <p><strong>Email:</strong> {{ email }}</p>
+	</div>
+	{% if user_type == 'patient'%}
+        <form action="/user_interface" method="POST">
+            <button type="submit" name="fetchBillButton" class="btn btn-primary btn-fetch-bill">Fetch Bill</button>
+        </form>
+        
+        <form action="/update_patient_form" method="GET">
+            <button type="submit" name="updateUserDetails" class="btn btn-primary btn-fetch-bill">Update Details</button>
+        </form>
+
+        <div class="bill-amount" id="billAmount"></div>
+    {% endif %}
+
+    {% if user_type == 'provider'%}
+        <form action="/user_interface" method="POST">
+          	<input type="text" name="patient_id" placeholder="Patient Id" required>
+            <button type="submit" name="fetchBillButton" class="btn btn-primary btn-fetch-bill">Fetch Bill</button>
+        </form>
+
+        <form action="/update_patient_form" method="GET">
+		<input type="text" name="patient_id" placeholder="Patient Id" required>
+            <button type="submit" name="updateUserDetails" class="btn btn-primary btn-fetch-bill">Update Details</button>
+        </form>
+
+
+
+        <div class="bill-amount" id="billAmount"></div>
+    {% endif %}
+
+
+
+{% if user_type == 'nurse'%}
+        <form action="/user_interface" method="POST">
+          	<input type="text" name="patient_id" placeholder="Patient Id" required >
+            <button type="submit" name="fetchBillButton" class="btn btn-primary btn-fetch-bill">Fetch Bill</button>
+        </form>
+
+        <form action="/update_patient_form" method="GET">	
+		<input type="text" name="patient_id" placeholder="Patient Id">
+            <button type="submit" name="updateUserDetails" class="btn btn-primary btn-fetch-bill">Update Details</button>
+        </form>
+
+        <div class="bill-amount" id="billAmount"></div>
+    {% endif %}
+
+    {% if user_type %}
+    <div class="logout-button">
+        <form action="/logout" method="POST">
+            <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+	{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="container">
+        <div class="alert alert-danger" role="alert">
+            {% for message in messages %}
+            <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('button[name="fetchBillButton"]').on('click', function(event) {
+            event.preventDefault();
+
+            // Get the patient ID from the session variable
+                patientId = $('input[name="patient_id"]').val();
+
+            $.ajax({
+                    url: '/generate_bill',
+                    type: 'GET',
+                    data: { patient_id: patientId },  // Include the patient ID in the request
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            console.error('Error fetching bill:', data.error);
+                        } else {
+                            const billAmount = data.bill;
+                            $('#billAmount').text('Bill Amount: ' + billAmount);
+                        }
+                    },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching bill:', error);
+                }
+            });
+        });
+
+        $('form[action="/logout"]').on('submit', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: '/logout',
+                type: 'POST',
+                success: function(response) {
+                    // Redirect to the login page after successful logout
+                    window.location.href = '/login';
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error logging out:', error);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
+
